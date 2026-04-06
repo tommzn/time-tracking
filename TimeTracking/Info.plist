@@ -5,6 +5,11 @@
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>remote-notification</string>
+		<string>location</string>
 	</array>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>TimeTracking uses your location to detect when you arrive at and leave the office.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>TimeTracking needs background location access to automatically log your office arrivals and departures.</string>
 </dict>
 </plist>

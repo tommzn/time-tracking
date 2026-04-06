@@ -10,22 +10,37 @@ import SwiftData
 
 @main
 struct TimeTrackingApp: App {
-    var sharedModelContainer: ModelContainer = {
-        let schema = Schema([
-            Item.self,
-        ])
-        let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
+    let sharedModelContainer: ModelContainer
+    let locationManager: LocationManager
+    let mqttManager: MQTTManager
 
+    init() {
+        let schema = Schema([
+            TimeEntry.self,
+            AppSettings.self,
+        ])
+        let modelConfiguration = ModelConfiguration(
+            schema: schema,
+            isStoredInMemoryOnly: false,
+            cloudKitDatabase: .private("iCloud.de.tommzn.TimeTracking")
+        )
         do {
-            return try ModelContainer(for: schema, configurations: [modelConfiguration])
+            let container = try ModelContainer(for: schema, configurations: [modelConfiguration])
+            sharedModelContainer = container
+            locationManager = LocationManager()
+            locationManager.setup(modelContainer: container)
+            mqttManager = MQTTManager()
+            mqttManager.setup(modelContainer: container)
         } catch {
             fatalError("Could not create ModelContainer: \(error)")
         }
-    }()
+    }
 
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .environment(locationManager)
+                .environment(mqttManager)
         }
         .modelContainer(sharedModelContainer)
     }
