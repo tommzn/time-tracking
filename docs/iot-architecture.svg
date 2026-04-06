@@ -1,0 +1,148 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 415"
+     width="880" height="415"
+     font-family="system-ui,-apple-system,'Segoe UI',sans-serif">
+  <defs>
+    <marker id="ah" markerWidth="9" markerHeight="7" refX="8" refY="3.5" orient="auto">
+      <polygon points="0 0,9 3.5,0 7" fill="#64748b"/>
+    </marker>
+    <marker id="ahd" markerWidth="9" markerHeight="7" refX="8" refY="3.5" orient="auto">
+      <polygon points="0 0,9 3.5,0 7" fill="#94a3b8"/>
+    </marker>
+  </defs>
+
+  <!-- Canvas -->
+  <rect width="880" height="415" rx="14" fill="#f8fafc"/>
+
+  <!-- Title -->
+  <text x="440" y="34" text-anchor="middle" font-size="15" font-weight="700"
+        fill="#0f172a" letter-spacing="0.2">IoT Button Integration Architecture</text>
+
+  <!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+       IoT Button box
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+  <rect x="28" y="52" width="170" height="202" rx="10"
+        fill="#eff6ff" stroke="#3b82f6" stroke-width="1.5"/>
+
+  <!-- header text -->
+  <text x="113" y="72" text-anchor="middle" font-size="12" font-weight="700" fill="#1e40af">IoT Button V2</text>
+  <text x="113" y="86" text-anchor="middle" font-size="10" fill="#3b82f6">Seeed Studio</text>
+
+  <!-- button icon: concentric rings -->
+  <circle cx="113" cy="124" r="30" fill="#dbeafe"/>
+  <circle cx="113" cy="124" r="21" fill="#93c5fd"/>
+  <circle cx="113" cy="124" r="12" fill="#3b82f6"/>
+
+  <!-- separator -->
+  <line x1="44" y1="154" x2="182" y2="154" stroke="#bfdbfe" stroke-width="1"/>
+
+  <!-- action mapping -->
+  <text x="44" y="170" font-size="9.5" fill="#374151">single tap    →  Working Time</text>
+  <text x="44" y="186" font-size="9.5" fill="#374151">double tap  →  Sickness</text>
+  <text x="44" y="202" font-size="9.5" fill="#374151">long press    →  Vacation</text>
+
+  <!-- payload hint -->
+  <text x="113" y="234" text-anchor="middle" font-size="9" fill="#94a3b8">{ "action": "single_tap" }</text>
+
+  <!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+       Solid arrow: Button → HiveMQ
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+  <line x1="200" y1="151" x2="346" y2="151"
+        stroke="#64748b" stroke-width="1.5" marker-end="url(#ah)"/>
+  <text x="273" y="141" text-anchor="middle" font-size="10" fill="#64748b">MQTT / Wi-Fi</text>
+
+  <!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+       HiveMQ Cloud box
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+  <rect x="348" y="58" width="175" height="186" rx="10"
+        fill="#faf5ff" stroke="#9333ea" stroke-width="1.5"/>
+
+  <!-- cloud shape -->
+  <ellipse cx="456" cy="102" rx="26" ry="17" fill="#e9d5ff"/>
+  <ellipse cx="437" cy="109" rx="18" ry="14" fill="#e9d5ff"/>
+  <ellipse cx="475" cy="109" rx="18" ry="14" fill="#e9d5ff"/>
+  <rect x="421" y="109" width="70" height="14" fill="#e9d5ff"/>
+
+  <!-- header text -->
+  <text x="435" y="76" text-anchor="middle" font-size="12" font-weight="700" fill="#6b21a8">HiveMQ Cloud</text>
+
+  <!-- separator -->
+  <line x1="364" y1="134" x2="507" y2="134" stroke="#d8b4fe" stroke-width="1"/>
+
+  <!-- details -->
+  <text x="435" y="153" text-anchor="middle" font-size="11" font-weight="600" fill="#374151">MQTT Broker</text>
+  <text x="435" y="171" text-anchor="middle" font-size="10" fill="#6b7280">Port 8883 · TLS</text>
+  <text x="435" y="187" text-anchor="middle" font-size="10" fill="#6b7280">QoS 1</text>
+  <text x="435" y="203" text-anchor="middle" font-size="10" fill="#6b7280">Persistent Sessions</text>
+  <text x="435" y="219" text-anchor="middle" font-size="10" fill="#6b7280">Offline Queueing</text>
+
+  <!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+       Solid arrow: HiveMQ → App
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+  <line x1="525" y1="151" x2="656" y2="151"
+        stroke="#64748b" stroke-width="1.5" marker-end="url(#ah)"/>
+  <text x="590" y="141" text-anchor="middle" font-size="10" fill="#64748b">MQTT / TLS</text>
+
+  <!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+       TimeTracking App box
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+  <rect x="658" y="58" width="192" height="186" rx="10"
+        fill="#f0fdf4" stroke="#16a34a" stroke-width="1.5"/>
+
+  <!-- phone icon -->
+  <rect x="724" y="70" width="52" height="64" rx="8"
+        fill="#bbf7d0" stroke="#4ade80" stroke-width="1"/>
+  <rect x="728" y="75" width="44" height="46" rx="3" fill="#86efac"/>
+  <circle cx="750" cy="126" r="3.5" fill="#4ade80"/>
+
+  <!-- header text -->
+  <text x="754" y="151" text-anchor="middle" font-size="12" font-weight="700" fill="#166534">TimeTracking</text>
+  <text x="754" y="165" text-anchor="middle" font-size="10" fill="#16a34a">iOS App</text>
+
+  <!-- separator -->
+  <line x1="674" y1="174" x2="834" y2="174" stroke="#bbf7d0" stroke-width="1"/>
+
+  <!-- details -->
+  <text x="754" y="191" text-anchor="middle" font-size="10" fill="#6b7280">Creates TimeEntry</text>
+  <text x="754" y="207" text-anchor="middle" font-size="10" fill="#6b7280">iCloud Sync</text>
+  <text x="754" y="223" text-anchor="middle" font-size="10" fill="#6b7280">Excel Report Export</text>
+
+  <!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+       Optional path label
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+  <text x="440" y="280" text-anchor="middle" font-size="10" fill="#94a3b8" font-style="italic">
+    ╌ ╌ ╌  optional path via Home Assistant MQTT Discovery  ╌ ╌ ╌
+  </text>
+
+  <!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+       Home Assistant box (optional)
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+  <rect x="186" y="298" width="186" height="82" rx="10"
+        fill="#fff7ed" stroke="#f97316" stroke-width="1.5" stroke-dasharray="5,3"/>
+
+  <!-- house icon -->
+  <polygon points="228,336 245,318 262,336" fill="#fed7aa"/>
+  <rect x="232" y="335" width="26" height="22" rx="2" fill="#fed7aa"/>
+  <rect x="238" y="341" width="14" height="16" rx="2" fill="#f97316" opacity="0.25"/>
+
+  <!-- text -->
+  <text x="322" y="322" text-anchor="middle" font-size="11" font-weight="700" fill="#c2410c">Home Assistant</text>
+  <text x="322" y="340" text-anchor="middle" font-size="10" fill="#ea580c">MQTT Discovery</text>
+  <text x="322" y="358" text-anchor="middle" font-size="10" fill="#9a3412">(optional)</text>
+
+  <!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+       Dashed arrow: Button bottom → HA
+       Right-angle path: down then right
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+  <path d="M 113,256 L 113,291 L 186,291 L 186,298"
+        fill="none" stroke="#94a3b8" stroke-width="1.5"
+        stroke-dasharray="5,3" marker-end="url(#ahd)"/>
+
+  <!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+       Dashed arrow: HA right → HiveMQ bottom
+       Right-angle path: right then up
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+  <path d="M 372,339 L 435,339 L 435,246"
+        fill="none" stroke="#94a3b8" stroke-width="1.5"
+        stroke-dasharray="5,3" marker-end="url(#ahd)"/>
+
+</svg>

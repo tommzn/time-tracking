@@ -124,11 +124,7 @@ A small Wi-Fi connected button that publishes an MQTT message on each press acti
 
 ### Architecture
 
-```
-IoT Button  →  Wi-Fi  →  MQTT Broker (HiveMQ)  →  TimeTracking app
-                               ↑
-                     Home Assistant (optional)
-```
+![IoT Integration Architecture](docs/iot-architecture.svg)
 
 ### MQTT Broker — HiveMQ
 
