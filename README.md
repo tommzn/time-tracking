@@ -151,7 +151,7 @@ Follow the official guide: [IoT Button V2 + Home Assistant MQTT Discovery](https
 The app expects a JSON payload on the configured topic:
 
 ```json
-{ "action": "single_tap" }
+{"action":"single_tap","timestamp":"2026-04-04T10:04:39Z"}
 ```
 
 Valid `action` values: `single_tap`, `double_tap`, `long_tap`.

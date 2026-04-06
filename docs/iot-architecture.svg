@@ -41,7 +41,8 @@
   <text x="44" y="202" font-size="9.5" fill="#374151">long press    →  Vacation</text>
 
   <!-- payload hint -->
-  <text x="113" y="234" text-anchor="middle" font-size="9" fill="#94a3b8">{ "action": "single_tap" }</text>
+  <text x="113" y="228" text-anchor="middle" font-size="9" fill="#94a3b8">{"action":"single_tap",</text>
+  <text x="113" y="240" text-anchor="middle" font-size="9" fill="#94a3b8">"timestamp":"…"}</text>
 
   <!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
        Solid arrow: Button → HiveMQ
