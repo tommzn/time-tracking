@@ -158,6 +158,14 @@ struct SettingsFormView: View {
                 Toggle("Use TLS", isOn: $settings.mqttUseTLS)
                     .onChange(of: settings.mqttUseTLS) { _, _ in save() }
 
+                Picker("Message Format", selection: $settings.mqttMessageFormat) {
+                    Text(MQTTMessageFormat.default.label)
+                        .tag(MQTTMessageFormat.default)
+                    Text(MQTTMessageFormat.seedStudioIoTButtonV2.label)
+                        .tag(MQTTMessageFormat.seedStudioIoTButtonV2)
+                }
+                .onChange(of: settings.mqttMessageFormat) { _, _ in save() }
+
                 Button {
                     save()
                     mqttManager.updateConnection(for: settings)
@@ -284,6 +292,8 @@ struct MapLocationPicker: View {
     @Environment(\.dismiss) private var dismiss
     @State private var cameraPosition: MapCameraPosition
     @State private var centerCoordinate: CLLocationCoordinate2D
+    @State private var searchText: String = ""
+    @State private var searchResults: [MKMapItem] = []
 
     init(latitude: Double, longitude: Double, onConfirm: @escaping (Double, Double) -> Void) {
         self.onConfirm = onConfirm
@@ -310,9 +320,63 @@ struct MapLocationPicker: View {
                     .shadow(radius: 4)
                     .allowsHitTesting(false)
 
-                // Live coordinate readout
-                VStack {
+                VStack(spacing: 0) {
+                    // Search bar
+                    HStack(spacing: 8) {
+                        Image(systemName: "magnifyingglass")
+                            .foregroundStyle(.secondary)
+                        TextField("Search location…", text: $searchText)
+                            .autocorrectionDisabled()
+                            .textInputAutocapitalization(.never)
+                            .onSubmit { performSearch() }
+                        if !searchText.isEmpty {
+                            Button {
+                                searchText = ""
+                                searchResults = []
+                            } label: {
+                                Image(systemName: "xmark.circle.fill")
+                                    .foregroundStyle(.secondary)
+                            }
+                        }
+                    }
+                    .padding(10)
+                    .background(.regularMaterial)
+                    .clipShape(RoundedRectangle(cornerRadius: 10))
+                    .padding(.horizontal, 12)
+                    .padding(.top, 8)
+
+                    // Search results list
+                    if !searchResults.isEmpty {
+                        ScrollView {
+                            LazyVStack(alignment: .leading, spacing: 0) {
+                                ForEach(searchResults, id: \.self) { item in
+                                    Button { selectResult(item) } label: {
+                                        VStack(alignment: .leading, spacing: 2) {
+                                            Text(item.name ?? "Unknown")
+                                                .font(.body)
+                                                .foregroundStyle(.primary)
+                                            Text(subtitle(for: item.placemark))
+                                                .font(.caption)
+                                                .foregroundStyle(.secondary)
+                                        }
+                                        .padding(.horizontal, 12)
+                                        .padding(.vertical, 8)
+                                        .frame(maxWidth: .infinity, alignment: .leading)
+                                    }
+                                    Divider().padding(.leading, 12)
+                                }
+                            }
+                        }
+                        .frame(maxHeight: 220)
+                        .background(.regularMaterial)
+                        .clipShape(RoundedRectangle(cornerRadius: 10))
+                        .padding(.horizontal, 12)
+                        .padding(.top, 4)
+                    }
+
                     Spacer()
+
+                    // Live coordinate readout
                     Text(String(format: "%.5f, %.5f",
                                 centerCoordinate.latitude,
                                 centerCoordinate.longitude))
@@ -322,8 +386,8 @@ struct MapLocationPicker: View {
                         .background(.regularMaterial)
                         .clipShape(Capsule())
                         .padding(.bottom, 24)
+                        .allowsHitTesting(false)
                 }
-                .allowsHitTesting(false)
             }
             .navigationTitle("Office Location")
             .navigationBarTitleDisplayMode(.inline)
@@ -339,5 +403,29 @@ struct MapLocationPicker: View {
                 }
             }
         }
+    }
+
+    private func performSearch() {
+        let query = searchText.trimmingCharacters(in: .whitespaces)
+        guard !query.isEmpty else { return }
+        let request = MKLocalSearch.Request()
+        request.naturalLanguageQuery = query
+        MKLocalSearch(request: request).start { response, _ in
+            searchResults = response?.mapItems ?? []
+        }
+    }
+
+    private func selectResult(_ item: MKMapItem) {
+        let coord = item.placemark.coordinate
+        centerCoordinate = coord
+        cameraPosition = .camera(MapCamera(centerCoordinate: coord, distance: 800))
+        searchText = ""
+        searchResults = []
+    }
+
+    private func subtitle(for placemark: MKPlacemark) -> String {
+        [placemark.locality, placemark.administrativeArea, placemark.country]
+            .compactMap { $0 }
+            .joined(separator: ", ")
     }
 }

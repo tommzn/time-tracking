@@ -30,7 +30,17 @@ final class AppSettings {
     /// Topic the device publishes time events to.
     var mqttTopic: String = ""
     var mqttUseTLS: Bool = true
+    /// Raw string backing store for mqttMessageFormat — String is required for
+    /// CloudKit compatibility (CloudKit does not support transformable attributes,
+    /// so the enum cannot be persisted directly).
+    var mqttMessageFormatRaw: String = "default"
     // Credentials are stored in the keychain via KeychainStore, not here.
+
+    /// Typed accessor for the MQTT message format. Reads/writes mqttMessageFormatRaw.
+    var mqttMessageFormat: MQTTMessageFormat {
+        get { MQTTMessageFormat(rawValue: mqttMessageFormatRaw) ?? .default }
+        set { mqttMessageFormatRaw = newValue.rawValue }
+    }
 
     init(
         defaultWorkingHours: Double = 8.0,
@@ -41,7 +51,8 @@ final class AppSettings {
         mqttHost: String = "",
         mqttPort: Int = 8883,
         mqttTopic: String = "",
-        mqttUseTLS: Bool = true
+        mqttUseTLS: Bool = true,
+        mqttMessageFormat: MQTTMessageFormat = .default
     ) {
         self.defaultWorkingHours   = defaultWorkingHours
         self.officeLocationEnabled = officeLocationEnabled
@@ -52,6 +63,7 @@ final class AppSettings {
         self.mqttPort              = mqttPort
         self.mqttTopic             = mqttTopic
         self.mqttUseTLS            = mqttUseTLS
+        self.mqttMessageFormatRaw  = mqttMessageFormat.rawValue
     }
 
     /// True only when both coordinates are present.

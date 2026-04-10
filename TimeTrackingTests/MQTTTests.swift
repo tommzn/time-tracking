@@ -58,6 +58,75 @@ struct IoTMessageTests {
     }
 }
 
+// MARK: - SeedStudioIoTMessage action mapping
+
+struct SeedStudioIoTMessageTests {
+
+    @Test func singlePressMapsToWorkingTime() {
+        let msg = SeedStudioIoTMessage(action: "single_press", time: "2026-04-09T23:53:10.215566+02:00")
+        #expect(msg.entryType == .workingTime)
+    }
+
+    @Test func doublePressMapsToSickness() {
+        let msg = SeedStudioIoTMessage(action: "double_press", time: "2026-04-09T23:53:10.215566+02:00")
+        #expect(msg.entryType == .sickness)
+    }
+
+    @Test func longPressMapsToVacation() {
+        let msg = SeedStudioIoTMessage(action: "long_press", time: "2026-04-09T23:53:10.215566+02:00")
+        #expect(msg.entryType == .vacation)
+    }
+
+    @Test func unknownActionReturnsNil() {
+        let msg = SeedStudioIoTMessage(action: "triple_press", time: "2026-04-09T23:53:10.215566+02:00")
+        #expect(msg.entryType == nil)
+    }
+
+    @Test func emptyActionReturnsNil() {
+        let msg = SeedStudioIoTMessage(action: "", time: "2026-04-09T23:53:10.215566+02:00")
+        #expect(msg.entryType == nil)
+    }
+
+    @Test func decodesFromJSON() throws {
+        let json = #"{"action":"double_press","entity_id":"switch.iot_button_v2_switch_2","time":"2026-04-09T23:53:10.215566+02:00"}"#
+        let msg = try JSONDecoder().decode(SeedStudioIoTMessage.self, from: Data(json.utf8))
+        #expect(msg.action == "double_press")
+        #expect(msg.time == "2026-04-09T23:53:10.215566+02:00")
+        #expect(msg.entryType == .sickness)
+    }
+
+    @Test func allActionsDecodeCorrectly() throws {
+        let cases: [(String, EntryType)] = [
+            ("single_press", .workingTime),
+            ("double_press", .sickness),
+            ("long_press",   .vacation),
+        ]
+        for (action, expected) in cases {
+            let json = "{\"action\":\"\(action)\",\"time\":\"2026-04-09T23:53:10.215566+02:00\"}"
+            let msg = try JSONDecoder().decode(SeedStudioIoTMessage.self, from: Data(json.utf8))
+            #expect(msg.entryType == expected)
+        }
+    }
+}
+
+// MARK: - MQTTMessageFormat
+
+struct MQTTMessageFormatTests {
+
+    @Test func defaultLabel() {
+        #expect(MQTTMessageFormat.default.label == "Default")
+    }
+
+    @Test func seedStudioLabel() {
+        #expect(MQTTMessageFormat.seedStudioIoTButtonV2.label == "Seeed Studio IoT Button V2")
+    }
+
+    @Test func rawValues() {
+        #expect(MQTTMessageFormat.default.rawValue == "default")
+        #expect(MQTTMessageFormat.seedStudioIoTButtonV2.rawValue == "seedStudioIoTButtonV2")
+    }
+}
+
 // MARK: - MQTTConnectionState labels and images
 
 struct MQTTConnectionStateTests {

@@ -11,6 +11,20 @@ import SwiftData
 import SwiftUI
 import Observation
 
+// MARK: - Message format
+
+enum MQTTMessageFormat: String, Codable {
+    case `default`           = "default"
+    case seedStudioIoTButtonV2 = "seedStudioIoTButtonV2"
+
+    var label: String {
+        switch self {
+        case .default:             "Default"
+        case .seedStudioIoTButtonV2: "Seeed Studio IoT Button V2"
+        }
+    }
+}
+
 // MARK: - Connection state
 
 enum MQTTConnectionState: Equatable {
@@ -60,6 +74,7 @@ final class MQTTManager {
 
     @ObservationIgnored private var client: MQTTClient?
     @ObservationIgnored private var modelContainer: ModelContainer?
+    @ObservationIgnored private var messageFormat: MQTTMessageFormat = .default
 
     // MARK: Setup
 
@@ -70,6 +85,7 @@ final class MQTTManager {
     // MARK: Public control
 
     func updateConnection(for settings: AppSettings) {
+        messageFormat = settings.mqttMessageFormat
         // Tear down any existing connection first.
         let old = client
         client = nil
@@ -122,10 +138,27 @@ final class MQTTManager {
 
     private func handlePayload(_ payload: String) {
         guard let data      = payload.data(using: .utf8),
-              let msg       = try? JSONDecoder().decode(IoTMessage.self, from: data),
-              let type      = msg.entryType,
               let container = modelContainer else { return }
-        let timestamp = ISO8601DateFormatter().date(from: msg.timestamp) ?? Date()
+
+        let timestamp: Date
+        let type: EntryType
+
+        switch messageFormat {
+        case .default:
+            guard let msg = try? JSONDecoder().decode(IoTMessage.self, from: data),
+                  let t   = msg.entryType else { return }
+            type      = t
+            timestamp = ISO8601DateFormatter().date(from: msg.timestamp) ?? Date()
+
+        case .seedStudioIoTButtonV2:
+            guard let msg = try? JSONDecoder().decode(SeedStudioIoTMessage.self, from: data),
+                  let t   = msg.entryType else { return }
+            type = t
+            let formatter = ISO8601DateFormatter()
+            formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+            timestamp = formatter.date(from: msg.time) ?? Date()
+        }
+
         let ctx = ModelContext(container)
         ctx.autosaveEnabled = false
         ctx.insert(TimeEntry(timestamp: timestamp, type: type))
@@ -145,6 +178,23 @@ struct IoTMessage: Decodable {
         case "double_tap": .sickness
         case "long_tap":   .vacation
         default:           nil
+        }
+    }
+}
+
+// MARK: - Seeed Studio IoT Button V2 message model
+// Payload: {"action":"double_press","entity_id":"switch.iot_button_v2_switch_2","time":"2026-04-09T23:53:10.215566+02:00"}
+
+struct SeedStudioIoTMessage: Decodable {
+    let action: String
+    let time: String
+
+    var entryType: EntryType? {
+        switch action {
+        case "single_press": .workingTime
+        case "double_press": .sickness
+        case "long_press":   .vacation
+        default:             nil
         }
     }
 }

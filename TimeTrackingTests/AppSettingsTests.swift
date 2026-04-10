@@ -167,6 +167,11 @@ struct AppSettingsTests {
         #expect(settings.mqttTopic.isEmpty)
     }
 
+    @Test func loadOrCreateDefaultsMQTTMessageFormatIsDefault() throws {
+        let settings = try makeStore().loadOrCreate()
+        #expect(settings.mqttMessageFormat == .default)
+    }
+
     // MARK: - hasMQTTConfiguration
 
     @Test func hasMQTTConfigurationFalseByDefault() throws {
@@ -211,6 +216,24 @@ struct AppSettingsTests {
         #expect(reloaded.mqttPort    == 1883)
         #expect(reloaded.mqttTopic   == "time/events")
         #expect(reloaded.mqttUseTLS  == false)
+    }
+
+    @Test func mqttMessageFormatPersists() throws {
+        let store    = try makeStore()
+        let settings = try store.loadOrCreate()
+        settings.mqttMessageFormat = .seedStudioIoTButtonV2
+        try store.save()
+
+        let reloaded = try store.loadOrCreate()
+        #expect(reloaded.mqttMessageFormat == .seedStudioIoTButtonV2)
+    }
+
+    @Test func mqttMessageFormatStoredAsRawString() throws {
+        // Verifies the CloudKit-compatible String backing store holds the correct value.
+        let settings = try makeStore().loadOrCreate()
+        #expect(settings.mqttMessageFormatRaw == "default")
+        settings.mqttMessageFormat = .seedStudioIoTButtonV2
+        #expect(settings.mqttMessageFormatRaw == "seedStudioIoTButtonV2")
     }
 
     @Test func canUpdateCoordinatesWithoutChangingEnabledFlag() throws {

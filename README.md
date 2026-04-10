@@ -98,11 +98,20 @@ Set your default working hours per day (4–10 h) in **Settings**. This value is
 2. Enable **Use Office Location**
 3. Grant **Always** location permission when prompted
 4. Tap **Change Location** and pick your office on the map
+   - Use the **search bar** at the top of the map to find an address or place by name — tap a result to jump to it, then fine-tune by dragging the map
+   - The coordinate readout at the bottom shows the exact position of the crosshair pin
 
 Once configured, the app automatically creates entries when you arrive at or leave the office.
 
 ### MQTT / IoT Button
-See the [IoT Button Setup](#iot-button-setup) section below.
+See the [IoT Button Setup](#iot-button-setup) section below for broker setup.
+
+In **Settings → IoT / MQTT**, set the **Message Format** to match the payload your device publishes:
+
+| Format | Action field values | Timestamp field |
+|---|---|---|
+| **Default** | `single_tap`, `double_tap`, `long_tap` | `timestamp` |
+| **Seeed Studio IoT Button V2** | `single_press`, `double_press`, `long_press` | `time` |
 
 ---
 
@@ -116,11 +125,11 @@ The app supports receiving time events from a physical button over MQTT. This le
 
 A small Wi-Fi connected button that publishes an MQTT message on each press action:
 
-| Button action | Entry type logged |
-|---|---|
-| Single tap | Working Time |
-| Double tap | Sickness |
-| Long press | Vacation |
+| Button action | MQTT `action` value | Entry type logged |
+|---|---|---|
+| Single tap | `single_press` | Working Time |
+| Double tap | `double_press` | Sickness |
+| Long press | `long_press` | Vacation |
 
 ### Architecture
 
@@ -148,13 +157,27 @@ Follow the official guide: [IoT Button V2 + Home Assistant MQTT Discovery](https
 
 ### Expected MQTT Payload
 
-The app expects a JSON payload on the configured topic:
+The app supports two payload formats, selectable per connection in Settings.
 
+**Default format**
 ```json
 {"action":"single_tap","timestamp":"2026-04-04T10:04:39Z"}
 ```
-
 Valid `action` values: `single_tap`, `double_tap`, `long_tap`.
+
+**Seeed Studio IoT Button V2 format** (e.g. via Home Assistant MQTT Discovery)
+```json
+{"action":"double_press","entity_id":"switch.iot_button_v2_switch_2","time":"2026-04-09T23:53:10.215566+02:00"}
+```
+Valid `action` values: `single_press`, `double_press`, `long_press`.
+
+In both formats the action maps to the same entry types:
+
+| Action | Entry type |
+|---|---|
+| `single_tap` / `single_press` | Working Time |
+| `double_tap` / `double_press` | Sickness |
+| `long_tap` / `long_press` | Vacation |
 
 ### Testing with mosquitto_pub
 
@@ -208,15 +231,16 @@ Test targets cover: data model, time entry store, settings, keychain, location m
 
 ```
 TimeTracking/
-├── TimeTrackingApp.swift       # App entry point, dependency setup
+├── TimeTrackingApp.swift       # App entry point, dependency setup, store recovery
+├── AppSchema.swift             # Versioned SwiftData schemas and migration plan
 ├── ContentView.swift           # Main calendar + entry list view
-├── SettingsView.swift          # Settings sheet
+├── SettingsView.swift          # Settings sheet (incl. map location picker with search)
 ├── Item.swift                  # EntryType, WorkLocation, TimeEntry model
 ├── AppSettings.swift           # AppSettings model
 ├── TimeEntryStore.swift        # Entry persistence and queries
 ├── SettingsStore.swift         # Settings persistence
 ├── LocationManager.swift       # Geofencing and location detection
-├── MQTTManager.swift           # MQTT client and IoT message handling
+├── MQTTManager.swift           # MQTT client, IoT message handling, message formats
 ├── KeychainStore.swift         # Secure credential storage
 ├── MonthReport.swift           # Monthly report data generation
 └── XLSXExporter.swift          # Excel file writer
